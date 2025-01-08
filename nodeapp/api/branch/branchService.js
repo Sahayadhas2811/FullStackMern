@@ -67,12 +67,12 @@ async function getAllBr(){
     }
 }
 
-async function deleteCreatedData(id) {
-    if (!id) {
+async function deleteCreatedData(locaitonId) {
+    if (!locaitonId) {
         throw new Error('ID is missing');
     }
     try {
-        const deleteData = await branchModel.findOneAndDelete({ _id: id });
+        const deleteData = await branchModel.findOneAndDelete({ locaitonId: locaitonId });
         if (!deleteData) {
             throw new Error('No Data deleted');
         } else {

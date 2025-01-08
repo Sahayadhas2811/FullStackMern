@@ -1,4 +1,4 @@
-import { Box, Table, TablePagination, TableCell, TableRow, TableHead, TableBody, TableContainer, Paper } from "@mui/material";
+import { Box, Table, TablePagination, TableCell, TableRow, TableHead, TableBody, TableContainer, Paper, Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { axiosPrivate } from "../axios/Axios";
 
@@ -27,6 +27,15 @@ const TableDataBranch : React.FC = ()=>{
         fetchBranch();
     },[]);
 
+    const handleDelete = async(locaitonId:string)=>{
+        try {
+            await axiosPrivate.delete(`/branch/deleteBranchData?locaitonId=${locaitonId}`)
+        setBranchDetails(branchDetails.filter(data => data.locaitonId !== locaitonId)); 
+        } catch (error:any) {
+            return {message:error.message}
+        }
+    }
+
     const handlePageChange = (event:any, newPage:number)=>{
         setPage(newPage)
     };
@@ -36,6 +45,34 @@ const TableDataBranch : React.FC = ()=>{
         setPage(0)
     };
 
+    const calculateTotal = () => {
+        const parseNumber = (value: string): number => {
+          const clearVal = value.replace(/[^0-9.]/g, '');
+          return parseFloat(clearVal) || 0;
+        };
+    
+        return branchDetails.reduce(
+          (total, br) => {
+            total.potentialRev += parseNumber(br.potentialRev || '0');
+            total.competitorVolume += parseNumber(br.competitorVolume || '0');
+            total.competitorMerchant += parseNumber(br.competitorMerchant || '0');
+            total.revenue_Acc += parseNumber(br.revenue_Acc || '0');
+            total.marketShare += parseNumber(br.marketShare || '0');
+            total.commercialDDa += parseNumber(br.commercialDDa || '0');
+            return total;
+          },
+          {
+            potentialRev: 0,
+            competitorVolume: 0,
+            competitorMerchant: 0,
+            revenue_Acc: 0,
+            marketShare: 0,
+            commercialDDa: 0,
+          }
+        );
+      };
+    
+      const total = calculateTotal();
     const branchInPage = branchDetails.slice(page*rowsPerPage, page*rowsPerPage+rowsPerPage)
 
 
@@ -45,7 +82,7 @@ const TableDataBranch : React.FC = ()=>{
             <TableContainer component={Paper}>
             <Table>
             <TableHead>
-            <TableRow>
+            <TableRow sx={{backgroundColor:'lightgray'}}>
                 <TableCell>Branch</TableCell>
                 <TableCell>Potential Revenue Annualized</TableCell>
                 <TableCell>Competitor Processing Volume</TableCell>
@@ -55,6 +92,18 @@ const TableDataBranch : React.FC = ()=>{
                 <TableCell>Commercial DDA's</TableCell>
                 <TableCell>Action</TableCell>
             </TableRow>
+            </TableHead>
+            <TableHead>
+                <TableRow sx={{backgroundColor:'lightgray'}}>
+                    <TableCell sx={{fontWeight:'bold'}}>Branch Name</TableCell>
+                    <TableCell>{total.potentialRev.toFixed(0)}</TableCell>
+                    <TableCell>{total.competitorVolume.toFixed(0)}</TableCell>
+                    <TableCell>{total.competitorMerchant.toFixed(0)}</TableCell>
+                    <TableCell>{total.revenue_Acc.toFixed(0)}</TableCell>
+                    <TableCell>{total.marketShare.toFixed()}%</TableCell>
+                    <TableCell>{total.commercialDDa.toFixed(0)}</TableCell>
+                    <TableCell></TableCell>
+                </TableRow>
             </TableHead>
             <TableBody>
                 {branchInPage.map(br =>(
@@ -66,6 +115,14 @@ const TableDataBranch : React.FC = ()=>{
                         <TableCell>{br.revenue_Acc}</TableCell>
                         <TableCell>{br.marketShare}</TableCell>
                         <TableCell>{br.commercialDDa}</TableCell>
+                        <TableCell>
+                            <Button
+                            variant="outlined"
+                            onClick={()=>handleDelete(br.locaitonId)}
+                            >
+                                X
+                            </Button>
+                        </TableCell>
                     </TableRow>
                 ))}
             </TableBody>

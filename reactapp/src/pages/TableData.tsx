@@ -47,6 +47,24 @@ const TableData : React.FC = ()=>{
         setPage(0)
     };
 
+    const calculateTotal = ()=>{
+        return locDetails.reduce((total, loc)=>{
+            const parseNumber = (value:string)=>{
+                const cleanVal = value.replace(/[^0-9.]/g, '');
+                return parseFloat(cleanVal) || 0;
+            }
+            total.potentialRev += parseNumber(loc.potentialRev || '0');
+            total.competitorVolume += parseNumber(loc.competitorVolume || '0');
+            total.competitorMerchant += parseNumber(loc.competitorMerchant || '0');
+            total.revenue_Acc += parseNumber(loc.revenue_Acc || '0');
+            total.marketShare += parseNumber(loc.marketShare || '0');
+            total.commercialDDa += parseNumber(loc.commercialDDa || '0');
+            return total;
+        },{potentialRev:0, commercialDDa:0,competitorVolume:0,competitorMerchant:0,revenue_Acc:0,marketShare:0}
+    )
+    } 
+
+    const total = calculateTotal();
     const locationInPage = locDetails.slice(page*rowsPerPage, page*rowsPerPage+rowsPerPage)
 
 
@@ -56,7 +74,7 @@ const TableData : React.FC = ()=>{
             <TableContainer component={Paper}>
             <Table>
             <TableHead>
-            <TableRow>
+            <TableRow sx={{backgroundColor:'lightgray'}}>
                 <TableCell>Location</TableCell>
                 <TableCell>Potential Revenue Annualized</TableCell>
                 <TableCell>Competitor Processing Volume</TableCell>
@@ -66,6 +84,18 @@ const TableData : React.FC = ()=>{
                 <TableCell>Commercial DDA's</TableCell>
                 <TableCell>Action</TableCell>
             </TableRow>
+            </TableHead>
+            <TableHead>
+                <TableRow sx={{backgroundColor:'lightgray'}}>
+                    <TableCell sx={{fontWeight:'bold'}}>US</TableCell>
+                    <TableCell>${total.potentialRev.toFixed(2)}(100%)</TableCell>
+                    <TableCell>${total.competitorVolume.toFixed(2)}(100%)</TableCell>
+                    <TableCell>{total.competitorMerchant.toFixed(0)}</TableCell>
+                    <TableCell>${total.revenue_Acc.toFixed(1)}</TableCell>
+                    <TableCell>{total.marketShare.toFixed(2)}%</TableCell>
+                    <TableCell>{total.commercialDDa.toFixed(1)}</TableCell>
+                    <TableCell></TableCell>
+                </TableRow>
             </TableHead>
             <TableBody>
                 {locationInPage.map(loc =>(

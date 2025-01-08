@@ -30,7 +30,7 @@ function getAllBranch(req, res, next){
 }
 
 function dataDelete(req, res, next) {
-    const id = req.query._id ?? null;
+    const id = req.query.locaitonId?? null;
     branchService.deleteCreatedData(id)
         .then(obj => new ResObject(res, obj))
         .catch(next);
